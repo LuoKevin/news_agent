@@ -91,7 +91,7 @@ def classify_intent(user_message: str) -> IntentResult:
     openai.api_key = api_key
     prompt = _build_prompt(query)
     try:
-        completion = openai.ChatCompletion.create(
+        completion = openai.chat.completions.create(
             model=model,
             messages=[
                 {"role": "system", "content": "You are a precise intent classifier."},
