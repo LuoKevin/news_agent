@@ -16,7 +16,7 @@ class NewsClient:
     client: NewsDataApiClient
     
     def __init__(self, api_key: str):
-        self.client = NewsDataApiClient(api_key=api_key)
+        self.client = NewsDataApiClient(apikey=api_key)
     
     def _api_to_news_response_map(self, api_response: dict) -> NewsResponse:
         return NewsResponse(
