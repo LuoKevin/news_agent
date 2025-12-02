@@ -19,7 +19,6 @@ from langchain.tools import tool
 class Intent(str, Enum):
     NEWS_REQUEST = "news_request"
     GENERAL_QUERY = "general_query"
-    SMALL_TALK = "small_talk"
     UNKNOWN = "unknown"
 
 class IntentResult(BaseModel):
@@ -35,7 +34,7 @@ def _build_prompt(user_message: str) -> str:
     # Constrain the model to a JSON response for easier downstream parsing.
     return (
         "You classify user messages into intents.\n"
-        "Allowed intents: news_request, general_query, small_talk, unknown.\n"
+        "Allowed intents: news_request, general_query, unknown.\n"
         "If it is clearly asking for news about a topic or category (tech, finance, sports, politics, etc.), "
         "mark news_request and include the topic string. Otherwise general_query. "
         "Return JSON with keys: intent, confidence (0-1), topic (string or null).\n"

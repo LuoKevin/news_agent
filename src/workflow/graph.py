@@ -1,26 +1,47 @@
-from langchain.agents import create_agent
-from langchain_openai import ChatOpenAI
+from typing import TypedDict
 
-from src.workflow.nodes import classify_intent
+from langgraph.graph import END, StateGraph
+from langgraph.graph.state import CompiledStateGraph
+
+from src.workflow.nodes.handlers import HandlerResult, handle_general_query, handle_news_request, handle_unknown
+from src.workflow.nodes.intent import Intent, IntentResult, classify_intent
 
 
-SYSTEM_PROMPT="""You are an expert in news and information.
+class GraphState(TypedDict, total=False):
+    message: str
+    intent: IntentResult
+    response: HandlerResult
 
-You have access to two tools:
 
-- classify_intent: use this to get the intent of the user query
-- handle_news_request: use this to handle requests regarding news
-- handle_general_query: use this to answer general queries from the user
+def _classify_node(state: GraphState) -> GraphState:
+    return {"intent": classify_intent(state["message"])}
 
-You respond based on the intent. If its a news query, get the latest news and summarize the headlines. 
-Otherwise answer normally for general queries.
-"""
-class NewsGraph:
-    
-    def __init__(self, openai: ChatOpenAI):
-        self.graph = create_agent(
-            model=openai,
-            tools=[classify_intent, ],
-            system_prompt=SYSTEM_PROMPT
-        )
 
+def _route(state: GraphState) -> str:
+    intent = state["intent"].intent
+    if intent == Intent.NEWS_REQUEST:
+        return "news"
+    if intent == Intent.GENERAL_QUERY:
+        return "general"
+    return "unknown"
+
+
+def build_graph() -> CompiledStateGraph:
+    g = StateGraph(GraphState)
+    g.add_node("classify", _classify_node)
+    g.add_node("news", lambda state: {"response": handle_news_request(state["intent"])})
+    g.add_node("general", lambda state: {"response": handle_general_query(state["intent"])})
+    g.add_node("unknown", lambda state: {"response": handle_unknown(state["intent"])})
+
+    g.set_entry_point("classify")
+    g.add_conditional_edges("classify", _route, {"news": "news", "general": "general", "unknown": "unknown"})
+    for node in ["news", "general", "unknown"]:
+        g.add_edge(node, END)
+
+    return g.compile()
+
+
+def run_graph(graph: CompiledStateGraph, message: str) -> HandlerResult:
+    state = {"message": message}
+    final = graph.invoke(state)
+    return final["response"]
