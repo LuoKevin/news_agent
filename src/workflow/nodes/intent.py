@@ -67,7 +67,7 @@ def _parse_response(text: str, query: str) -> IntentResult:
         error=None if intent is not Intent.UNKNOWN else data.get("error"),
     )
 
-@tool
+@tool("classify_intent")
 def classify_intent(user_message: str) -> IntentResult:
     """
     Classify a user message using the OpenAI ChatCompletion API.

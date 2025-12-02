@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 from typing import Optional
+from langchain.tools import tool
 
-from src.core.intent import IntentResult 
+from src.workflow.nodes.intent import IntentResult 
 from src.services.factories import get_news_client, get_openai_client
 
 @dataclass
@@ -10,6 +11,7 @@ class HandlerResult:
     source: Optional[str] = None
     error: Optional[str] = None
 
+@tool
 def handle_news_request(intent: IntentResult) -> HandlerResult:
     """
     Placeholder news handler.
@@ -80,7 +82,7 @@ def handle_news_request(intent: IntentResult) -> HandlerResult:
         source = "news_handler_stub",
     )
 
-
+@tool
 def handle_general_query(intent: IntentResult) -> HandlerResult:
     """
     Placeholder general QA handler.

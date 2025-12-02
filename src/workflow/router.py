@@ -2,8 +2,8 @@
 Routes user messages to the appropriate handler based on intent.
 """
 
-from src.core.intent import Intent, classify_intent
-from src.workflow.handlers import (
+from src.workflow.nodes.intent import Intent, classify_intent
+from src.workflow.nodes.handlers import (
     HandlerResult,
     handle_general_query,
     handle_news_request,

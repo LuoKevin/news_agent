@@ -1,4 +1,4 @@
-from src.core.intent import Intent, classify_intent
+from src.workflow.nodes.intent import Intent, classify_intent
 
 
 def test_classify_intent_handles_missing_key(monkeypatch):
