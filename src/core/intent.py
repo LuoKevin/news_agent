@@ -13,7 +13,8 @@ from enum import Enum
 from typing import Optional
 
 import openai
-
+from pydantic import BaseModel
+from langchain.tools import tool
 
 class Intent(str, Enum):
     NEWS_REQUEST = "news_request"
@@ -21,14 +22,13 @@ class Intent(str, Enum):
     SMALL_TALK = "small_talk"
     UNKNOWN = "unknown"
 
-
-@dataclass
-class IntentResult:
+class IntentResult(BaseModel):
     intent: Intent
     confidence: float
     query: str
     topic: Optional[str] = None
     error: Optional[str] = None
+
 
 
 def _build_prompt(user_message: str) -> str:
@@ -67,7 +67,7 @@ def _parse_response(text: str, query: str) -> IntentResult:
         error=None if intent is not Intent.UNKNOWN else data.get("error"),
     )
 
-
+@tool
 def classify_intent(user_message: str) -> IntentResult:
     """
     Classify a user message using the OpenAI ChatCompletion API.
