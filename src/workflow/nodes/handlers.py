@@ -11,7 +11,6 @@ class HandlerResult:
     source: Optional[str] = None
     error: Optional[str] = None
 
-@tool
 def handle_news_request(intent: IntentResult) -> HandlerResult:
     """
     Placeholder news handler.
@@ -82,7 +81,6 @@ def handle_news_request(intent: IntentResult) -> HandlerResult:
         source = "news_handler_stub",
     )
 
-@tool
 def handle_general_query(intent: IntentResult) -> HandlerResult:
     """
     Placeholder general QA handler.

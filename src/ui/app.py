@@ -5,8 +5,6 @@ Run locally:
     streamlit run src/ui/app.py
 """
 
-from typing import Dict, List
-
 import streamlit as st
 
 from src.core.config import Settings
@@ -30,7 +28,7 @@ def load_settings():
 
 def ensure_history():
     if "chat_history" not in st.session_state:
-        st.session_state.chat_history: List[Dict[str, str]] = []
+        st.session_state.chat_history = []
 
 
 def main():
@@ -52,8 +50,8 @@ def main():
             st.error(f"Config error: {settings_error}")
         else:
             st.success("Config loaded from .env")
-        st.write(f"News API key: {'✅' if settings and settings.news_api_key else '⚠️ missing'}")
-        st.write(f"OpenAI API key: {'✅' if settings and settings.openai_api_key else '⚠️ missing'}")
+        st.write(f"News API key: {'✅' if settings and settings.NEWS_API_KEY else '⚠️ missing'}")
+        st.write(f"OpenAI API key: {'✅' if settings and settings.OPENAI_API_KEY else '⚠️ missing'}")
         st.markdown("---")
         st.info("Ask for the latest news on a topic or any general question.")
 
@@ -83,7 +81,7 @@ def main():
                 graph = load_graph()
                 try:
                     result = run_graph(graph, enriched_prompt)
-                    reply = result.message
+                    reply = result.response
                     source = result.source
                     error = result.error
                 except Exception as exc:  # noqa: BLE001

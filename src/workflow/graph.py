@@ -5,7 +5,7 @@ from langgraph.graph.state import CompiledStateGraph
 
 from src.workflow.nodes.handlers import HandlerResult, handle_general_query, handle_news_request, handle_unknown
 from src.workflow.nodes.intent import Intent, IntentResult, classify_intent
-
+from src.core.config import Settings
 
 class GraphState(TypedDict, total=False):
     message: str
@@ -41,7 +41,14 @@ def build_graph() -> CompiledStateGraph:
     return g.compile()
 
 
-def run_graph(graph: CompiledStateGraph, message: str) -> HandlerResult:
+def run_graph(graph: CompiledStateGraph, message: str):
     state = {"message": message}
     final = graph.invoke(state)
     return final["response"]
+
+if __name__ == "__main__":
+    graph = build_graph()
+    print(Settings())
+    state = {"message": "Greetings!"}
+    response = graph.invoke(state)
+    print(response["response"])

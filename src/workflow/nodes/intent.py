@@ -16,6 +16,8 @@ import openai
 from pydantic import BaseModel
 from langchain.tools import tool
 
+from src.services.factories import get_settings
+
 class Intent(str, Enum):
     NEWS_REQUEST = "news_request"
     GENERAL_QUERY = "general_query"
@@ -66,7 +68,6 @@ def _parse_response(text: str, query: str) -> IntentResult:
         error=None if intent is not Intent.UNKNOWN else data.get("error"),
     )
 
-@tool("classify_intent")
 def classify_intent(user_message: str) -> IntentResult:
     """
     Classify a user message using the OpenAI ChatCompletion API.
@@ -75,9 +76,10 @@ def classify_intent(user_message: str) -> IntentResult:
     - OPENAI_API_KEY must be set.
     - Model defaults to gpt-3.5-turbo unless OPENAI_MODEL is set.
     """
+    settings = get_settings()
     query = user_message.strip()
-    api_key = os.getenv("OPENAI_API_KEY")
-    model = os.getenv("OPENAI_MODEL", "gpt-3.5-turbo")
+    api_key = settings.OPENAI_API_KEY
+    model = "gpt-3.5-turbo"
     if not api_key:
         return IntentResult(
             intent=Intent.UNKNOWN,
@@ -99,7 +101,7 @@ def classify_intent(user_message: str) -> IntentResult:
             temperature=0,
             max_tokens=150,
         )
-        text = completion["choices"][0]["message"]["content"]
+        text = completion.choices[0].message.content
         return _parse_response(text, query)
     except Exception as exc:  # noqa: BLE001
         return IntentResult(
